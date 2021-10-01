@@ -23,7 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -141,7 +143,8 @@ class StatisticsStoryReporterTests
                 + "  }\n"
                 + "}";
         assertEquals(expected, output);
-        verifyNoInteractions(bddRunContext);
+        verify(bddRunContext, times(36)).isDone();
+        verifyNoMoreInteractions(bddRunContext);
     }
 
     @Test
@@ -156,7 +159,8 @@ class StatisticsStoryReporterTests
             () -> assertEquals(10, output.get(NodeType.SCENARIO).getTotal()),
             () -> assertEquals(18, output.get(NodeType.STEP).getTotal()),
             () -> assertEquals(5, output.get(NodeType.GIVEN_STORY).getTotal()));
-        verifyNoInteractions(bddRunContext);
+        verify(bddRunContext, times(36)).isDone();
+        verifyNoMoreInteractions(bddRunContext);
     }
 
     @Test
@@ -173,7 +177,8 @@ class StatisticsStoryReporterTests
             assertEquals(String.format("Unable to write statistics.json into folder: %s", tempDir),
                     event.getFormattedMessage());
             assertThat(event.getThrowable().get(), instanceOf(IOException.class));
-            verifyNoInteractions(bddRunContext);
+            verify(bddRunContext, times(36)).isDone();
+            verifyNoMoreInteractions(bddRunContext);
         }
     }
 
@@ -371,7 +376,8 @@ class StatisticsStoryReporterTests
                 + "  }\n"
                 + "}";
         assertEquals(expected, statistic);
-        verifyNoInteractions(bddRunContext);
+        verify(bddRunContext, times(12)).isDone();
+        verifyNoMoreInteractions(bddRunContext);
     }
 
     @Test
@@ -433,7 +439,8 @@ class StatisticsStoryReporterTests
                 + "  }\n"
                 + "}";
         assertEquals(expected, statistic);
-        verifyNoInteractions(bddRunContext);
+        verify(bddRunContext, times(8)).isDone();
+        verifyNoMoreInteractions(bddRunContext);
     }
 
     @Test
@@ -496,7 +503,8 @@ class StatisticsStoryReporterTests
                 + "  }\n"
                 + "}";
         assertEquals(expected, statistic);
-        verifyNoInteractions(bddRunContext);
+        verify(bddRunContext, times(8)).isDone();
+        verifyNoMoreInteractions(bddRunContext);
     }
 
     @Test

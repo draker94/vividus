@@ -270,7 +270,10 @@ public class AllureStoryReporter extends ChainedStoryReporter
     @Override
     public void beforeStep(Step step)
     {
-        startBddStep(step.getStepAsString());
+        if (!bddRunContext.isDone())
+        {
+            startBddStep(step.getStepAsString());
+        }
         super.beforeStep(step);
     }
 
@@ -278,8 +281,11 @@ public class AllureStoryReporter extends ChainedStoryReporter
     public void successful(String step)
     {
         super.successful(step);
-        modifyStepTitle(step);
-        stopBddStep(Status.PASSED);
+        if (!bddRunContext.isDone())
+        {
+            modifyStepTitle(step);
+            stopBddStep(Status.PASSED);
+        }
     }
 
     @Override
@@ -316,29 +322,32 @@ public class AllureStoryReporter extends ChainedStoryReporter
     {
         super.failed(step, throwable);
 
-        checkForBeforeAfterScenarioSteps();
-
-        if (!(throwable instanceof UUIDExceptionWrapper) || !(throwable.getCause() instanceof BeforeOrAfterFailed))
+        if (!bddRunContext.isDone())
         {
-            modifyStepTitle(step);
-        }
-        Throwable cause = JBehaveFailureUnwrapper.unwrapCause(throwable);
-        boolean isVerificationError = cause instanceof VerificationError;
-        if (isVerificationError)
-        {
-            cause = verificationErrorAdapter.adapt((VerificationError) cause);
+            checkForBeforeAfterScenarioSteps();
 
-            List<Link> links = new ArrayList<>();
-            for (KnownIssue knownIssue: ((VerificationError) cause).getKnownIssues())
+            if (!(throwable instanceof UUIDExceptionWrapper) || !(throwable.getCause() instanceof BeforeOrAfterFailed))
             {
-                if (!knownIssue.isPotentiallyKnown())
-                {
-                    links.add(ResultsUtils.createIssueLink(knownIssue.getIdentifier()));
-                }
+                modifyStepTitle(step);
             }
-            lifecycle.updateTestCase(getRootStepId(), result -> result.getLinks().addAll(links));
+            Throwable cause = JBehaveFailureUnwrapper.unwrapCause(throwable);
+            boolean isVerificationError = cause instanceof VerificationError;
+            if (isVerificationError)
+            {
+                cause = verificationErrorAdapter.adapt((VerificationError) cause);
+
+                List<Link> links = new ArrayList<>();
+                for (KnownIssue knownIssue: ((VerificationError) cause).getKnownIssues())
+                {
+                    if (!knownIssue.isPotentiallyKnown())
+                    {
+                        links.add(ResultsUtils.createIssueLink(knownIssue.getIdentifier()));
+                    }
+                }
+                lifecycle.updateTestCase(getRootStepId(), result -> result.getLinks().addAll(links));
+            }
+            stopBddStep(StatusProvider.getStatus(cause), getStatusDetailsFromThrowable(cause));
         }
-        stopBddStep(StatusProvider.getStatus(cause), getStatusDetailsFromThrowable(cause));
     }
 
     @Override

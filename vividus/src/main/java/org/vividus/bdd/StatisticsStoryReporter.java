@@ -56,6 +56,7 @@ import org.vividus.softassert.event.AssertionFailedEvent;
 import org.vividus.testcontext.TestContext;
 import org.vividus.util.json.JsonUtils;
 
+@SuppressWarnings({ "PMD.GodClass", "PMD.ExcessiveImports" })
 public class StatisticsStoryReporter extends NullStoryReporter
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsStoryReporter.class);
@@ -181,6 +182,10 @@ public class StatisticsStoryReporter extends NullStoryReporter
     @Override
     public void beforeStep(Step step)
     {
+        if (skip(step.getStepAsString()))
+        {
+            return;
+        }
         if (step.getExecutionType() != StepExecutionType.COMMENT)
         {
             Node node = new Node(NodeType.STEP);
@@ -196,6 +201,10 @@ public class StatisticsStoryReporter extends NullStoryReporter
     @Override
     public void successful(String step)
     {
+        if (skip(step))
+        {
+            return;
+        }
         updateStepStatus(Status.PASSED);
     }
 
@@ -220,15 +229,16 @@ public class StatisticsStoryReporter extends NullStoryReporter
     @Override
     public void failed(String step, Throwable throwable)
     {
-        if (!StringUtils.contains(step, "verifyIfAssertionsPassed"))
+        if (skip(step))
         {
-            Status status = Status.from(StatusPriority.from(StatusProvider.getStatus(throwable)));
-            if (status == Status.BROKEN)
-            {
-                addFailure(() -> throwable.getCause().toString());
-            }
-            updateStepStatus(status);
+            return;
         }
+        Status status = Status.from(StatusPriority.from(StatusProvider.getStatus(throwable)));
+        if (status == Status.BROKEN)
+        {
+            addFailure(() -> throwable.getCause().toString());
+        }
+        updateStepStatus(status);
     }
 
     @Override
@@ -278,6 +288,11 @@ public class StatisticsStoryReporter extends NullStoryReporter
                               node.withStatus(Status.PASSED);
                               aggregate(node);
                           });
+    }
+
+    private boolean skip(String step)
+    {
+        return bddRunContext.isDone() || StringUtils.contains(step, "verifyIfAssertionsPassed");
     }
 
     private boolean hasNoExecutedChildrens(Node node)

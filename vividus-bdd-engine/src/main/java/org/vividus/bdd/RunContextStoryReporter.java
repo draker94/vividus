@@ -24,6 +24,7 @@ import org.jbehave.core.embedder.PerformableTree.Status;
 import org.jbehave.core.model.Scenario;
 import org.jbehave.core.model.Step;
 import org.jbehave.core.model.Story;
+import org.jbehave.core.steps.StepCollector.Stage;
 import org.jbehave.core.steps.Timing;
 import org.vividus.bdd.context.BddRunContext;
 import org.vividus.bdd.model.RunningScenario;
@@ -69,7 +70,10 @@ public class RunContextStoryReporter extends ChainedStoryReporter
     @Override
     public void beforeStep(Step step)
     {
-        bddRunContext.getRunningStory().putRunningStep(step.getStepAsString());
+        if (!bddRunContext.isDone())
+        {
+            bddRunContext.getRunningStory().putRunningStep(step.getStepAsString());
+        }
         super.beforeStep(step);
     }
 
@@ -77,15 +81,21 @@ public class RunContextStoryReporter extends ChainedStoryReporter
     public void successful(String step)
     {
         super.successful(step);
-        bddRunContext.getRunningStory().removeRunningStep();
+        if (!bddRunContext.isDone())
+        {
+            bddRunContext.getRunningStory().removeRunningStep();
+        }
     }
 
     @Override
     public void failed(String step, Throwable cause)
     {
         super.failed(step, cause);
-        bddRunContext.getRunningStory().fail();
-        bddRunContext.getRunningStory().removeRunningStep();
+        if (!bddRunContext.isDone())
+        {
+            bddRunContext.getRunningStory().fail();
+            bddRunContext.getRunningStory().removeRunningStep();
+        }
     }
 
     @Override
@@ -110,5 +120,16 @@ public class RunContextStoryReporter extends ChainedStoryReporter
     public void dryRun()
     {
         bddRunContext.setDryRun(true);
+    }
+
+    @Override
+    public void beforeStoriesSteps(Stage stage)
+    {
+        if (stage == Stage.AFTER)
+        {
+            System.out.println("off");
+            bddRunContext.setDone(true);
+        }
+        super.beforeStoriesSteps(stage);
     }
 }
