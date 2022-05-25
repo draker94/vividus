@@ -93,7 +93,7 @@ jobs:
 
     - name: Publish unit and integration tests reports
       if: always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Unit and Integration Tests - Reports - ${{ matrix.platform }}
         path: vividus/output/reports/tests
@@ -125,7 +125,7 @@ jobs:
 
     - name: Publish integration tests report
       if: matrix.platform == 'ubuntu-latest' && always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Integration Tests - Allure report
         path: vividus-tests/output/reports/allure
@@ -173,7 +173,7 @@ jobs:
 
     - name: Publish system tests report
       if: matrix.platform == 'ubuntu-latest' && always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: System Tests - Allure report
         path: vividus-tests/output/reports/allure
@@ -302,7 +302,7 @@ jobs:
 
     - name: SauceLabs - iOS - Mobile App - Publish system tests report
       if: matrix.platform == 'ubuntu-latest' && always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: SauceLabs - System Tests - Allure report - iOS
         path: vividus-tests/output/reports/sl-ios-allure
@@ -338,7 +338,7 @@ jobs:
 
     - name: SauceLabs - Android - Mobile App - Publish system tests report
       if: matrix.platform == 'ubuntu-latest' && always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: SauceLabs - System Tests - Allure report - Android
         path: vividus-tests/output/reports/sl-android-allure
@@ -396,7 +396,7 @@ jobs:
 
     - name: BrowserStack - iOS - Mobile App - Publish system tests report
       if: matrix.platform == 'macos-latest' && always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: BrowserStack - System Tests - Allure report - iOS
         path: vividus-tests/output/reports/bs-ios-allure
@@ -432,7 +432,7 @@ jobs:
 
     - name: BrowserStack - Android - Mobile App - Publish system tests report
       if: matrix.platform == 'macos-latest' && always()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: BrowserStack - System Tests - Allure report - Android
         path: vividus-tests/output/reports/bs-android-allure
