@@ -12,7 +12,7 @@ if (isFamily(FAMILY_WINDOWS)) {
     }
 }
 
-ext.hadoopVersion = '3.3.1'
+ext.hadoopVersion = '3.3.4'
 
 dependencies {
     api project(':vividus-bdd-engine')
